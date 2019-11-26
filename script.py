@@ -2,6 +2,7 @@ import git
 import urllib.request
 from bs4 import BeautifulSoup
 import urllib.request
+import csv
 
 def extractAuthor(gitlog):
     searchQuery = "Author: "
@@ -30,12 +31,22 @@ def extractCommitHashCodes(gitlog: list):
             
     return commits
 
+def extractTimeStamps(gitlog):
+    timestamps = list()
+    searchQuery = "Date:   "
+    for log in gitlog:
+        if searchQuery in log:
+            beginningIndex = log.index(searchQuery) + len(searchQuery)
+            timestamps.append(log[beginningIndex:])
+            
+    return timestamps
+
 def constructURL(author, project_name, commit):
     url = "http://github.com/" + author + "/" + project_name + "/commit/" + commit
     return url
             
-def run():
-    path_to_repo = "C:/Users/Vinay_2/Documents/CS 171"
+def run(path):
+    path_to_repo = path
     g = git.Repo(path_to_repo)
     gitlog = g.git.log(p=True).split("\n")
     
@@ -43,6 +54,7 @@ def run():
     author = extractAuthor(gitlog)
     project_name = extractProjectName(path_to_repo)
     commits = extractCommitHashCodes(gitlog)
+    time_stamps = extractTimeStamps(gitlog)
     
     urls = list()
     for commit in commits:
@@ -54,9 +66,17 @@ def run():
         soup = BeautifulSoup(html_doc, 'html.parser')
         commit_messages.append(soup.title.text)
     
-    table = zip(commits,commit_messages,urls)
-    for row in table:
-        print(row)
+    table = zip(time_stamps,commits,commit_messages,urls)
+    filename = project_name + ".csv"
+    with open(filename, 'w') as output_file:
+        output_writer = csv.writer(output_file,delimiter=",",quotechar='"', quoting=csv.QUOTE_MINIMAL)
+        output_writer.writerow(['Time','Hashcode','Commit Title','URL'])
+        for row in table:
+            output_writer.writerow(row)
         
 if __name__ == '__main__':
-    run()
+    input_file_path = sys.argv[1]
+    repo_list = input_file_path.readlines()
+    for repo in repo_list:
+        run(repo)
+#     run("C:/Users/Vinay_2/Documents/Mondego/ByteCodeAnalyzer")     
