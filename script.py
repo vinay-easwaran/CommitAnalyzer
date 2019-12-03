@@ -76,7 +76,8 @@ def run(path):
         
 if __name__ == '__main__':
     input_file_path = input("Enter link to project paths")
-    repo_list = input_file_path.split(",")
+    repo_list = input_file_path.readlines()
     for repo in repo_list:
+        repo.strip("\n")
         run(repo)
 #     run("C:/Users/Vinay_2/Documents/Mondego/ByteCodeAnalyzer")     
