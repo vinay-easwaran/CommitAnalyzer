@@ -67,7 +67,7 @@ def run(path):
         commit_messages.append(soup.title.text)
     
     table = zip(time_stamps,commits,commit_messages,urls)
-    filename = project_name + ".csv"
+    filename = "Output/" + project_name + ".csv"
     with open(filename, 'w') as output_file:
         output_writer = csv.writer(output_file,delimiter=",",quotechar='"', quoting=csv.QUOTE_MINIMAL)
         output_writer.writerow(['Time','Hashcode','Commit Title','URL'])
@@ -75,8 +75,8 @@ def run(path):
             output_writer.writerow(row)
         
 if __name__ == '__main__':
-    input_file_path = sys.argv[1]
-    repo_list = input_file_path.readlines()
+    input_file_path = input("Enter link to project paths")
+    repo_list = input_file_path.split(",")
     for repo in repo_list:
         run(repo)
 #     run("C:/Users/Vinay_2/Documents/Mondego/ByteCodeAnalyzer")     
